@@ -24,7 +24,7 @@ import rich
 import rich.progress
 
 import update_metadata_pb2
-
+import zstandard
 console = rich.console.Console()
 
 
@@ -159,11 +159,14 @@ def _extract_operation_to_file(
         case (
             update_metadata_pb2.InstallOperation.REPLACE_BZ
             | update_metadata_pb2.InstallOperation.REPLACE_XZ
+            | update_metadata_pb2.InstallOperation.REPLACE_ZSTD
         ):
             if operation.type == update_metadata_pb2.InstallOperation.REPLACE_BZ:
                 decompressed_data = bz2.decompress(data)
             elif operation.type == update_metadata_pb2.InstallOperation.REPLACE_XZ:
                 decompressed_data = lzma.decompress(data)
+            elif operation.type == update_metadata_pb2.InstallOperation.REPLACE_ZSTD:
+                decompressed_data = zstandard.decompress(data)
 
             # if writer:
             writer.write(out_offset, decompressed_data)
